@@ -13,6 +13,8 @@ services:
         value: "False"
       - key: CORS_ALLOW_ALL_ORIGINS
         value: "True"
+      - key: USE_SQLITE
+        value: "True"
     
   # React Frontend Service  
   - type: web
@@ -20,10 +22,4 @@ services:
     env: node
     buildCommand: "cd frontend && npm install && npm run build"
     startCommand: "cd frontend && npx serve -s build -p $PORT"
-    plan: free
-    
-databases:
-  - name: chemical-equipment-db
-    databaseName: chemical_equipment_db
-    user: chemical_user
     plan: free

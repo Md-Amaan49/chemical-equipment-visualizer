@@ -86,6 +86,14 @@ if os.environ.get('DATABASE_URL'):
     DATABASES = {
         'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
     }
+elif os.environ.get('USE_SQLITE', 'False').lower() == 'true':
+    # Use SQLite for deployment when PostgreSQL is not available
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': '/tmp/db.sqlite3',  # Use /tmp for Render's ephemeral storage
+        }
+    }
 else:
     DATABASES = {
         'default': {
