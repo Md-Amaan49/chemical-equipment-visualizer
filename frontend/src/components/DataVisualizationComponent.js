@@ -30,25 +30,25 @@ const DataVisualizationComponent = ({ dataset }) => {
   const [activeChart, setActiveChart] = useState('averages');
 
   useEffect(() => {
-    if (dataset && dataset.id) {
-      loadAnalytics();
-    }
-  }, [dataset]);
+    const loadAnalyticsData = async () => {
+      if (dataset && dataset.id) {
+        setLoading(true);
+        setError('');
+        
+        try {
+          const response = await getAnalytics(dataset.id);
+          setAnalyticsData(response.data);
+        } catch (error) {
+          setError('Failed to load analytics data');
+          console.error('Analytics error:', error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
 
-  const loadAnalytics = async () => {
-    setLoading(true);
-    setError('');
-    
-    try {
-      const response = await getAnalytics(dataset.id);
-      setAnalyticsData(response.data);
-    } catch (error) {
-      setError('Failed to load analytics data');
-      console.error('Analytics error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    loadAnalyticsData();
+  }, [dataset]);
 
   if (loading) {
     return <div className="loading">Loading analytics...</div>;

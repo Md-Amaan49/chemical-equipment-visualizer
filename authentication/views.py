@@ -6,39 +6,48 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.http import JsonResponse
+import json
 
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
 @csrf_exempt
 def login_view(request):
-    """User authentication endpoint"""
-    username = request.data.get('username')
-    password = request.data.get('password')
+    """User authentication endpoint - using plain Django view"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    print(f"Login request received: {request.method}")
+    print(f"Request headers: {dict(request.headers)}")
+    
+    try:
+        data = json.loads(request.body)
+        username = data.get('username')
+        password = data.get('password')
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    
+    print(f"Login attempt for username: {username}")
     
     if not username or not password:
-        return Response(
-            {'error': 'Username and password are required'}, 
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        print("Missing username or password")
+        return JsonResponse({'error': 'Username and password are required'}, status=400)
     
     user = authenticate(request, username=username, password=password)
     
     if user is not None:
         login(request, user)
-        return Response({
+        print(f"Login successful for user: {username}")
+        return JsonResponse({
             'message': 'Login successful',
             'user': {
                 'id': user.id,
                 'username': user.username,
                 'email': user.email
             }
-        }, status=status.HTTP_200_OK)
+        }, status=200)
     else:
-        return Response(
-            {'error': 'Invalid credentials'}, 
-            status=status.HTTP_401_UNAUTHORIZED
-        )
+        print(f"Authentication failed for user: {username}")
+        return JsonResponse({'error': 'Invalid credentials'}, status=401)
 
 
 @api_view(['POST'])
