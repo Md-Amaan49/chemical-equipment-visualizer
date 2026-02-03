@@ -1,0 +1,31 @@
+Equipment Name,Type,Flowrate,Pressure,Temperature
+Centrifugal Pump P-101,Pump,45.2,12.5,298.15
+Control Valve CV-201,Valve,0.0,15.2,295.0
+Shell-Tube Heat Exchanger HE-301,Heat Exchanger,78.5,8.7,323.5
+CSTR Reactor R-401,Reactor,25.3,22.1,373.15
+Reciprocating Compressor C-501,Compressor,120.0,35.0,310.0
+Centrifugal Pump P-102,Pump,52.1,14.2,301.5
+Ball Valve BV-202,Valve,0.0,18.5,298.0
+Plate Heat Exchanger HE-302,Heat Exchanger,65.8,9.2,318.2
+Batch Reactor R-402,Reactor,30.7,25.8,368.9
+Centrifugal Compressor C-502,Compressor,98.5,28.3,305.7
+Gear Pump P-103,Pump,41.8,11.9,299.8
+Gate Valve GV-203,Valve,0.0,16.7,296.5
+Double Pipe Heat Exchanger HE-303,Heat Exchanger,82.1,7.8,325.1
+PFR Reactor R-403,Reactor,28.9,24.5,371.2
+Rotary Compressor C-503,Compressor,115.2,32.1,312.3
+Diaphragm Pump P-104,Pump,38.7,13.8,302.1
+Butterfly Valve BF-204,Valve,0.0,19.3,297.2
+Spiral Heat Exchanger HE-304,Heat Exchanger,71.4,10.5,320.8
+Fluidized Bed Reactor R-404,Reactor,35.6,27.2,375.6
+Screw Compressor C-504,Compressor,105.8,30.7,308.9
+Peristaltic Pump P-105,Pump,22.3,8.9,296.7
+Check Valve CV-205,Valve,0.0,14.1,294.8
+Air Cooled Heat Exchanger HE-305,Heat Exchanger,89.2,6.3,315.4
+Packed Bed Reactor R-405,Reactor,42.1,29.8,378.3
+Axial Compressor C-505,Compressor,132.7,38.5,314.2
+Positive Displacement Pump P-106,Pump,47.9,16.4,303.8
+Pressure Relief Valve PRV-206,Valve,0.0,21.7,299.1
+Finned Tube Heat Exchanger HE-306,Heat Exchanger,76.3,11.2,322.7
+Membrane Reactor R-406,Reactor,18.4,31.5,365.2
+Liquid Ring Compressor C-506,Compressor,87.3,26.9,307.4

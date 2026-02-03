@@ -1,0 +1,187 @@
+.history-container {
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.history-container h2 {
+  margin-top: 0;
+  color: #333;
+}
+
+.history-container p {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+}
+
+.empty-state p {
+  margin: 0.5rem 0;
+}
+
+.datasets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.dataset-card {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 1.5rem;
+  background: #fafafa;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.dataset-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.dataset-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.dataset-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.1rem;
+  word-break: break-word;
+}
+
+.dataset-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.select-btn,
+.delete-btn {
+  padding: 0.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+
+.select-btn {
+  background: #e3f2fd;
+}
+
+.select-btn:hover {
+  background: #bbdefb;
+}
+
+.delete-btn {
+  background: #ffebee;
+}
+
+.delete-btn:hover {
+  background: #ffcdd2;
+}
+
+.dataset-info {
+  margin-bottom: 1rem;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.info-item .label {
+  color: #666;
+  font-weight: 500;
+}
+
+.info-item .value {
+  color: #333;
+}
+
+.dataset-summary {
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+}
+
+.dataset-summary h4 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.summary-item {
+  text-align: center;
+  padding: 0.5rem;
+  background: white;
+  border-radius: 4px;
+}
+
+.summary-label {
+  display: block;
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.summary-value {
+  display: block;
+  font-weight: bold;
+  color: #333;
+}
+
+.equipment-types {
+  margin-top: 1rem;
+}
+
+.equipment-types h5 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.types-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.type-badge {
+  background: #667eea;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.error-message {
+  background: #fee;
+  color: #c33;
+  padding: 1rem;
+  border-radius: 5px;
+  text-align: center;
+}
