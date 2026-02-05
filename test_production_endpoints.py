@@ -61,15 +61,19 @@ def test_login_endpoint():
         print(f"Login test failed: {e}")
         return False
 
-def test_admin_panel():
-    """Test admin panel"""
-    print("\nTesting production admin panel...")
+def test_db_endpoint():
+    """Test the database connectivity endpoint"""
+    print("\nTesting production database connectivity endpoint...")
     try:
-        response = requests.get(f"{PRODUCTION_URL}/admin/", timeout=30)
-        print(f"Admin panel status: {response.status_code}")
-        return response.status_code in [200, 302]  # 302 redirect to login is OK
+        response = requests.get(f"{PRODUCTION_URL}/api/auth/test-db/", timeout=30)
+        print(f"DB test status: {response.status_code}")
+        if response.status_code == 200:
+            print(f"Response: {response.json()}")
+        else:
+            print(f"Response text: {response.text[:500]}")
+        return response.status_code == 200
     except Exception as e:
-        print(f"Admin panel test failed: {e}")
+        print(f"DB test failed: {e}")
         return False
 
 def main():
@@ -79,8 +83,8 @@ def main():
     tests = [
         ("Health Check", test_health_check),
         ("Auth Test", test_auth_test_endpoint),
+        ("Database Test", test_db_endpoint),
         ("Login", test_login_endpoint),
-        ("Admin Panel", test_admin_panel),
     ]
     
     results = []
