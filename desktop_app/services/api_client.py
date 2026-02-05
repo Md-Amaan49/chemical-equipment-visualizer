@@ -5,6 +5,7 @@ Handles communication with Django REST API backend
 
 import requests
 import json
+import os
 from typing import Dict, Any, Optional
 
 
@@ -48,12 +49,13 @@ class APIClient:
         """Upload CSV file"""
         url = f"{self.base_url}/upload/"
         
-        with open(file_path, 'rb') as file:
-            files = {'file': file}
-            # Remove Content-Type header for file upload
-            headers = {k: v for k, v in self.session.headers.items() 
-                      if k.lower() != 'content-type'}
-            response = self.session.post(url, files=files, headers=headers)
+        # Open file and upload using multipart/form-data
+        with open(file_path, 'rb') as file_obj:
+            files = {'file': (os.path.basename(file_path), file_obj, 'text/csv')}
+            
+            # Create a new session without JSON headers for file upload
+            # Don't use self.session for file uploads as it has JSON headers
+            response = requests.post(url, files=files, cookies=self.session.cookies)
         
         response.raise_for_status()
         return response.json()

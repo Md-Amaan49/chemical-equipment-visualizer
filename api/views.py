@@ -15,35 +15,40 @@ from analytics.report_generator import ReportGenerator
 from .decorators import handle_api_errors
 
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
 @csrf_exempt
-@handle_api_errors
 def upload_csv(request):
     """
-    Upload and process CSV file containing equipment data
+    Upload and process CSV file containing equipment data - using plain Django view
     """
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Check if user is authenticated
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required'}, status=401)
+    
+    print(f"Upload request from user: {request.user.username}")
+    print(f"Request method: {request.method}")
+    print(f"Request content type: {request.content_type}")
+    print(f"Files in request: {list(request.FILES.keys())}")
+    print(f"POST data keys: {list(request.POST.keys())}")
+    print(f"Request META encoding: {request.META.get('CONTENT_TYPE', 'Not set')}")
+    
     if 'file' not in request.FILES:
-        return Response(
-            {'error': 'No file provided'}, 
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        print("❌ No 'file' key found in request.FILES")
+        print(f"Available keys in request.FILES: {list(request.FILES.keys())}")
+        print(f"Raw request body length: {len(request.body) if hasattr(request, 'body') else 'No body'}")
+        return JsonResponse({'error': 'No file provided'}, status=400)
     
     uploaded_file = request.FILES['file']
     
     # Validate file extension
     if not uploaded_file.name.endswith('.csv'):
-        return Response(
-            {'error': 'File must be a CSV file'}, 
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        return JsonResponse({'error': 'File must be a CSV file'}, status=400)
     
     # Validate file size (10MB limit)
     if uploaded_file.size > 10 * 1024 * 1024:
-        return Response(
-            {'error': 'File size exceeds 10MB limit'}, 
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        return JsonResponse({'error': 'File size exceeds 10MB limit'}, status=400)
     
     try:
         # Save file temporarily
@@ -66,7 +71,7 @@ def upload_csv(request):
         # Clean up temporary file
         default_storage.delete(file_path)
         
-        return Response({
+        return JsonResponse({
             'message': 'File uploaded and processed successfully',
             'dataset_id': dataset.id,
             'filename': dataset.filename,
@@ -76,7 +81,7 @@ def upload_csv(request):
                 'averages': summary['averages'],
                 'type_distribution': summary['type_distribution']
             }
-        }, status=status.HTTP_201_CREATED)
+        }, status=201)
         
     except ValueError as e:
         # Clean up temporary file if it exists
@@ -86,10 +91,7 @@ def upload_csv(request):
         except:
             pass
         
-        return Response(
-            {'error': str(e)}, 
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        return JsonResponse({'error': str(e)}, status=400)
     except Exception as e:
         # Clean up temporary file if it exists
         try:
@@ -98,10 +100,7 @@ def upload_csv(request):
         except:
             pass
         
-        return Response(
-            {'error': f'File processing error: {str(e)}'}, 
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+        return JsonResponse({'error': f'File processing error: {str(e)}'}, status=500)
 
 
 @api_view(['GET'])
@@ -324,22 +323,26 @@ import os
 from django.conf import settings
 
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-@handle_api_errors
+@csrf_exempt
 def load_sample_data(request):
     """
-    Load sample equipment data for demonstration
+    Load sample equipment data for demonstration - using plain Django view
     """
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    # Check if user is authenticated
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required'}, status=401)
+    
+    print(f"Sample data request from user: {request.user.username}")
+    
     try:
         # Path to sample data file
         sample_file_path = os.path.join(settings.BASE_DIR, 'sample_equipment_data.csv')
         
         if not os.path.exists(sample_file_path):
-            return Response(
-                {'error': 'Sample data file not found'}, 
-                status=status.HTTP_404_NOT_FOUND
-            )
+            return JsonResponse({'error': 'Sample data file not found'}, status=404)
         
         # Process sample data using analytics engine
         dataset, summary = AnalyticsEngine.process_csv(
@@ -351,7 +354,7 @@ def load_sample_data(request):
         # Clean up old datasets (keep only last 5)
         AnalyticsEngine.cleanup_old_datasets(request.user, limit=5)
         
-        return Response({
+        return JsonResponse({
             'message': 'Sample data loaded successfully',
             'dataset_id': dataset.id,
             'filename': dataset.filename,
@@ -361,13 +364,10 @@ def load_sample_data(request):
                 'averages': summary['averages'],
                 'type_distribution': summary['type_distribution']
             }
-        }, status=status.HTTP_201_CREATED)
+        }, status=201)
         
     except Exception as e:
-        return Response(
-            {'error': f'Failed to load sample data: {str(e)}'}, 
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+        return JsonResponse({'error': f'Failed to load sample data: {str(e)}'}, status=500)
 
 
 @api_view(['GET'])

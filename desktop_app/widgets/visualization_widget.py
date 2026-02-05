@@ -255,7 +255,7 @@ class VisualizationWidget(QWidget):
             }
             QHeaderView::section {
                 background-color: #f8f9fa;
-                padding: 8px;
+                padding: 4px;
                 border: 1px solid #e9ecef;
                 font-weight: bold;
             }

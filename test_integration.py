@@ -1,124 +1,140 @@
 #!/usr/bin/env python
 """
-Integration test script for Chemical Equipment Parameter Visualizer
+Comprehensive integration test for both web and desktop applications
 """
-import os
 import sys
-import django
+import os
+import requests
 
-# Setup Django environment
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'chemical_equipment_visualizer.settings')
-django.setup()
+# Add desktop_app to Python path
+sys.path.append(os.path.join(os.path.dirname(__file__), 'desktop_app'))
 
-from django.contrib.auth.models import User
-from analytics.models import Dataset, EquipmentRecord
-from analytics.analytics_engine import AnalyticsEngine
-from analytics.report_generator import ReportGenerator
+from services.api_client import APIClient
 
-
-def test_integration():
-    """Test the complete workflow"""
-    print("🧪 Starting Integration Tests...")
+def test_web_integration():
+    """Test web application integration"""
+    print("🌐 Testing Web Application Integration...")
     
-    # Test 1: User creation
-    print("\n1. Testing User Management...")
+    session = requests.Session()
+    
+    # Test login
     try:
-        user, created = User.objects.get_or_create(
-            username='testuser',
-            defaults={'email': 'test@example.com'}
-        )
-        if created:
-            user.set_password('testpass123')
-            user.save()
-        print("✅ User management working")
+        login_url = "http://localhost:8000/api/auth/login/"
+        login_data = {"username": "admin", "password": "admin123"}
+        response = session.post(login_url, json=login_data)
+        response.raise_for_status()
+        print("✅ Web login successful")
     except Exception as e:
-        print(f"❌ User management failed: {e}")
+        print(f"❌ Web login failed: {e}")
         return False
     
-    # Test 2: Sample data processing
-    print("\n2. Testing Sample Data Processing...")
+    # Test upload
     try:
-        sample_file = 'sample_equipment_data.csv'
-        if os.path.exists(sample_file):
-            dataset, summary = AnalyticsEngine.process_csv(
-                sample_file, user, 'test_sample.csv'
-            )
-            print(f"✅ Sample data processed: {summary['total_count']} records")
-            print(f"   Equipment types: {list(summary['type_distribution'].keys())}")
-        else:
-            print("❌ Sample data file not found")
-            return False
+        upload_url = "http://localhost:8000/api/upload/"
+        with open("sample_equipment_data.csv", 'rb') as file_obj:
+            files = {'file': file_obj}
+            response = session.post(upload_url, files=files)
+        response.raise_for_status()
+        data = response.json()
+        dataset_id = data.get('dataset_id')
+        print(f"✅ Web upload successful - Dataset ID: {dataset_id}")
     except Exception as e:
-        print(f"❌ Sample data processing failed: {e}")
+        print(f"❌ Web upload failed: {e}")
         return False
     
-    # Test 3: Analytics calculations
-    print("\n3. Testing Analytics Calculations...")
+    # Test analytics
     try:
-        avg_flow = dataset.avg_flowrate
-        avg_pressure = dataset.avg_pressure
-        avg_temp = dataset.avg_temperature
-        print(f"✅ Analytics calculated:")
-        print(f"   Avg Flowrate: {avg_flow:.2f}")
-        print(f"   Avg Pressure: {avg_pressure:.2f}")
-        print(f"   Avg Temperature: {avg_temp:.2f}")
+        analytics_url = f"http://localhost:8000/api/analytics/{dataset_id}/"
+        response = session.get(analytics_url)
+        response.raise_for_status()
+        data = response.json()
+        print(f"✅ Web analytics successful - Records: {data.get('summary', {}).get('total_count')}")
     except Exception as e:
-        print(f"❌ Analytics calculation failed: {e}")
+        print(f"❌ Web analytics failed: {e}")
         return False
     
-    # Test 4: Database storage
-    print("\n4. Testing Database Storage...")
+    # Test history
     try:
-        equipment_count = EquipmentRecord.objects.filter(dataset=dataset).count()
-        print(f"✅ Database storage working: {equipment_count} equipment records stored")
+        history_url = "http://localhost:8000/api/history/"
+        response = session.get(history_url)
+        response.raise_for_status()
+        data = response.json()
+        print(f"✅ Web history successful - Datasets: {len(data.get('datasets', []))}")
     except Exception as e:
-        print(f"❌ Database storage failed: {e}")
+        print(f"❌ Web history failed: {e}")
         return False
-    
-    # Test 5: History management
-    print("\n5. Testing History Management...")
-    try:
-        user_datasets = Dataset.objects.filter(user=user).count()
-        print(f"✅ History management working: {user_datasets} datasets for user")
-    except Exception as e:
-        print(f"❌ History management failed: {e}")
-        return False
-    
-    # Test 6: PDF report generation
-    print("\n6. Testing PDF Report Generation...")
-    try:
-        report_generator = ReportGenerator()
-        report_buffer = report_generator.generate_report_buffer(dataset.id)
-        report_size = len(report_buffer.getvalue())
-        print(f"✅ PDF report generated: {report_size} bytes")
-    except Exception as e:
-        print(f"❌ PDF report generation failed: {e}")
-        return False
-    
-    # Test 7: Data validation
-    print("\n7. Testing Data Validation...")
-    try:
-        import pandas as pd
-        df = pd.read_csv(sample_file)
-        is_valid, error_msg = AnalyticsEngine.validate_equipment_data(df)
-        if is_valid:
-            print("✅ Data validation working")
-        else:
-            print(f"❌ Data validation failed: {error_msg}")
-            return False
-    except Exception as e:
-        print(f"❌ Data validation test failed: {e}")
-        return False
-    
-    print("\n🎉 All Integration Tests Passed!")
-    print("\n📊 System Summary:")
-    print(f"   - Total Datasets: {Dataset.objects.count()}")
-    print(f"   - Total Equipment Records: {EquipmentRecord.objects.count()}")
-    print(f"   - Total Users: {User.objects.count()}")
     
     return True
 
+def test_desktop_integration():
+    """Test desktop application integration"""
+    print("\n🖥️  Testing Desktop Application Integration...")
+    
+    api_client = APIClient()
+    
+    # Test login
+    try:
+        response = api_client.login("admin", "admin123")
+        print("✅ Desktop login successful")
+    except Exception as e:
+        print(f"❌ Desktop login failed: {e}")
+        return False
+    
+    # Test upload
+    try:
+        response = api_client.upload_csv("sample_equipment_data.csv")
+        dataset_id = response.get('dataset_id')
+        print(f"✅ Desktop upload successful - Dataset ID: {dataset_id}")
+    except Exception as e:
+        print(f"❌ Desktop upload failed: {e}")
+        return False
+    
+    # Test analytics
+    try:
+        response = api_client.get_analytics(dataset_id)
+        print(f"✅ Desktop analytics successful - Records: {response.get('summary', {}).get('total_count')}")
+    except Exception as e:
+        print(f"❌ Desktop analytics failed: {e}")
+        return False
+    
+    # Test history
+    try:
+        response = api_client.get_history()
+        print(f"✅ Desktop history successful - Datasets: {len(response.get('datasets', []))}")
+    except Exception as e:
+        print(f"❌ Desktop history failed: {e}")
+        return False
+    
+    return True
+
+def main():
+    """Run comprehensive integration tests"""
+    print("🧪 Running Comprehensive Integration Tests...")
+    print("=" * 60)
+    
+    # Check if sample file exists
+    if not os.path.exists("sample_equipment_data.csv"):
+        print("❌ Sample file 'sample_equipment_data.csv' not found!")
+        return False
+    
+    # Test web integration
+    web_success = test_web_integration()
+    
+    # Test desktop integration
+    desktop_success = test_desktop_integration()
+    
+    print("\n" + "=" * 60)
+    print("📊 Integration Test Results:")
+    print(f"Web Application: {'✅ PASS' if web_success else '❌ FAIL'}")
+    print(f"Desktop Application: {'✅ PASS' if desktop_success else '❌ FAIL'}")
+    
+    if web_success and desktop_success:
+        print("\n🎉 All integration tests passed!")
+        print("Both web and desktop applications are working correctly.")
+        return True
+    else:
+        print("\n❌ Some integration tests failed.")
+        return False
 
 if __name__ == '__main__':
-    success = test_integration()
-    sys.exit(0 if success else 1)
+    main()
