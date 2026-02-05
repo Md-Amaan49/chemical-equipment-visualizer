@@ -12,7 +12,7 @@ services:
       - key: DEBUG
         value: "False"
       - key: CORS_ALLOW_ALL_ORIGINS
-        value: "True"
+        value: "False"
       - key: USE_SQLITE
         value: "True"
     
@@ -23,3 +23,6 @@ services:
     buildCommand: "cd frontend && npm install && npm run build"
     startCommand: "cd frontend && npx serve -s build -p $PORT"
     plan: free
+    envVars:
+      - key: REACT_APP_API_URL
+        value: "https://chemical-equipment-backend-2p9z.onrender.com/api"

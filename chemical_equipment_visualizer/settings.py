@@ -164,10 +164,11 @@ REST_FRAMEWORK = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # React development server
     "http://127.0.0.1:3000",
+    "https://chemical-equipment-frontend-1wbm.onrender.com",  # Your actual frontend URL
 ]
 
-# For development, allow all origins
-CORS_ALLOW_ALL_ORIGINS = True
+# Add your Render frontend URL here after deployment
+CORS_ALLOW_ALL_ORIGINS = os.environ.get('CORS_ALLOW_ALL_ORIGINS', 'False').lower() == 'true'
 
 CORS_ALLOW_CREDENTIALS = True
 
