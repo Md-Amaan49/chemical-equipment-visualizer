@@ -20,6 +20,25 @@ def test_auth(request):
     return Response({'message': 'Authentication app is working'}, status=200)
 
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def test_db(request):
+    """Test database connectivity and user existence"""
+    try:
+        from django.contrib.auth.models import User
+        user_count = User.objects.count()
+        admin_exists = User.objects.filter(username='admin').exists()
+        
+        return Response({
+            'message': 'Database test successful',
+            'user_count': user_count,
+            'admin_exists': admin_exists
+        }, status=200)
+    except Exception as e:
+        logger.error(f"Database test error: {str(e)}")
+        return Response({'error': f'Database error: {str(e)}'}, status=500)
+
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_view(request):
