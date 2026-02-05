@@ -27,6 +27,10 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dknhwzo_%fz30+%^wo!ei
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
+# For debugging deployment issues, temporarily enable debug
+if os.environ.get('USE_SQLITE', 'False').lower() == 'true':
+    DEBUG = True  # Enable debug for deployment troubleshooting
+
 ALLOWED_HOSTS = ['*']  # Configure this properly for production
 
 
