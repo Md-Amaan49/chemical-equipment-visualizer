@@ -8,69 +8,76 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 
-@csrf_exempt
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def test_auth(request):
+    """Test endpoint to verify auth app is working"""
+    return Response({'message': 'Authentication app is working'}, status=200)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
 def login_view(request):
-    """User authentication endpoint - using plain Django view"""
-    if request.method != 'POST':
-        return JsonResponse({'error': 'Method not allowed'}, status=405)
-    
-    print(f"Login request received: {request.method}")
-    print(f"Request headers: {dict(request.headers)}")
-    
+    """User authentication endpoint - using DRF view"""
     try:
-        data = json.loads(request.body)
+        data = request.data
         username = data.get('username')
         password = data.get('password')
-    except json.JSONDecodeError:
-        return JsonResponse({'error': 'Invalid JSON'}, status=400)
-    
-    print(f"Login attempt for username: {username}")
-    
-    if not username or not password:
-        print("Missing username or password")
-        return JsonResponse({'error': 'Username and password are required'}, status=400)
-    
-    user = authenticate(request, username=username, password=password)
-    
-    if user is not None:
-        login(request, user)
-        print(f"Login successful for user: {username}")
-        return JsonResponse({
-            'message': 'Login successful',
-            'user': {
-                'id': user.id,
-                'username': user.username,
-                'email': user.email
-            }
-        }, status=200)
-    else:
-        print(f"Authentication failed for user: {username}")
-        return JsonResponse({'error': 'Invalid credentials'}, status=401)
+        
+        if not username or not password:
+            return Response({'error': 'Username and password are required'}, status=400)
+        
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            login(request, user)
+            return Response({
+                'message': 'Login successful',
+                'user': {
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email
+                }
+            }, status=200)
+        else:
+            return Response({'error': 'Invalid credentials'}, status=401)
+            
+    except Exception as e:
+        logger.error(f"Login error: {str(e)}")
+        return Response({'error': 'Internal server error'}, status=500)
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout_view(request):
     """User logout endpoint"""
-    logout(request)
-    return Response(
-        {'message': 'Logout successful'}, 
-        status=status.HTTP_200_OK
-    )
+    try:
+        logout(request)
+        return Response({'message': 'Logout successful'}, status=200)
+    except Exception as e:
+        logger.error(f"Logout error: {str(e)}")
+        return Response({'error': 'Internal server error'}, status=500)
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def user_info(request):
     """Get current user information"""
-    user = request.user
-    return Response({
-        'user': {
-            'id': user.id,
-            'username': user.username,
-            'email': user.email,
-            'is_authenticated': True
-        }
-    }, status=status.HTTP_200_OK)
+    try:
+        user = request.user
+        return Response({
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'is_authenticated': True
+            }
+        }, status=200)
+    except Exception as e:
+        logger.error(f"User info error: {str(e)}")
+        return Response({'error': 'Internal server error'}, status=500)

@@ -33,6 +33,33 @@ if os.environ.get('USE_SQLITE', 'False').lower() == 'true':
 
 ALLOWED_HOSTS = ['*']  # Configure this properly for production
 
+# Logging configuration for debugging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'authentication': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
+
 
 # Application definition
 
@@ -56,6 +83,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -169,6 +197,12 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # React development server
     "http://127.0.0.1:3000",
     "https://chemical-equipment-frontend-1wbm.onrender.com",  # Your actual frontend URL
+]
+
+# CSRF trusted origins for API requests
+CSRF_TRUSTED_ORIGINS = [
+    "https://chemical-equipment-frontend-1wbm.onrender.com",
+    "https://chemical-equipment-backend-2p9z.onrender.com",
 ]
 
 # Add your Render frontend URL here after deployment
