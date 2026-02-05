@@ -4,7 +4,7 @@ services:
     name: chemical-equipment-backend
     env: python
     buildCommand: "./build.sh"
-    startCommand: "gunicorn chemical_equipment_visualizer.wsgi:application"
+    startCommand: "python startup.py && gunicorn chemical_equipment_visualizer.wsgi:application"
     plan: free
     envVars:
       - key: SECRET_KEY
